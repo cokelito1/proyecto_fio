@@ -140,35 +140,27 @@
     (format stream "~%~%")))
 
 
-(defun write-sets (problem filename)
-  (with-open-file (stream filename :direction :output :if-does-not-exist :create :if-exists :overwrite)
-    (progn
-      (format stream "set of int: SOURCES     = 1..~d;~%" (sources problem))
-      (format stream "set of int: TANKS       = 1..~d;~%" (tanks problem))
-      (format stream "set of int: TRANS_NODES = 1..~d;~%" (length (trans-nodes problem)))
-      (format stream "set of int: FINAL_NODES = 1..~d;~%" (length (final-nodes problem)))
-      (format stream "set of int: PIPE_TYPE   = 1..~d;~%~%" (length (allowed-pipes problem))))))
+(defun write-sets (problem stream)
+    (format stream "set of int: SOURCES     = 1..~d;~%" (sources problem))
+    (format stream "set of int: TANKS       = 1..~d;~%" (tanks problem))
+    (format stream "set of int: TRANS_NODES = 1..~d;~%" (length (trans-nodes problem)))
+    (format stream "set of int: FINAL_NODES = 1..~d;~%" (length (final-nodes problem)))
+    (format stream "set of int: PIPE_TYPE   = 1..~d;~%~%" (length (allowed-pipes problem))))
 
 ; Esto se mala praxis, la eleccion de precios deberia ser parte de la creacion del problema, es decir si llamamos a write-pipes con el mismo problema no deberia cambiar el output, pero w/e
-(defun write-pipes (problem filename)
+(defun write-pipes (problem stream)
   (let ((prices (random-values (aops:each #'(lambda (pipe) (installation-cost pipe)) (allowed-pipes problem)))))
-    (with-open-file (stream filename :direction :output :if-exists :append)
-      (progn
-        (format stream "array [PIPE_TYPE] of int: price_of_pipe = [~{~d~^, ~}];~%" (coerce prices 'list))
-        (format stream "array [PIPE_TYPE] of int: capacity      = [~{~d~^, ~}];~%~%" (coerce (aops:each #'(lambda (pipe) (max-flow pipe)) (allowed-pipes problem)) 'list))))))
+      (format stream "array [PIPE_TYPE] of int: price_of_pipe = [~{~d~^, ~}];~%" (coerce prices 'list))
+      (format stream "array [PIPE_TYPE] of int: capacity      = [~{~d~^, ~}];~%~%" (coerce (aops:each #'(lambda (pipe) (max-flow pipe)) (allowed-pipes problem)) 'list))))
 
-(defun write-demands (problem filename)
-  (with-open-file (stream filename :direction :output :if-exists :append)
-    (progn
-      (format stream "array[FINAL_NODES] of float: demand_final = [~{~,5f~^, ~}];~%" (coerce (aops:each #'(lambda (node) (supply node)) (final-nodes problem)) 'list))
-      (format stream "array[TRANS_NODES] of float: demand_trans = [~{~,5f~^, ~}];~%~%" (coerce (aops:each #'(lambda (node) (supply node)) (trans-nodes problem)) 'list)))))
+(defun write-demands (problem stream)
+    (format stream "array[FINAL_NODES] of float: demand_final = [~{~,5f~^, ~}];~%" (coerce (aops:each #'(lambda (node) (supply node)) (final-nodes problem)) 'list))
+    (format stream "array[TRANS_NODES] of float: demand_trans = [~{~,5f~^, ~}];~%~%" (coerce (aops:each #'(lambda (node) (supply node)) (trans-nodes problem)) 'list)))
 
-(defun write-costs (problem filename)
-  (with-open-file (stream filename :direction :output :if-exists :append)
-    (progn
-      (write-matrix (cost-matrix-source-tanks problem) stream "SOURCES" "TANKS" "costs_sources_tanks")
-      (write-matrix (cost-matrix-tanks-trans problem) stream "TANKS" "TRANS_NODES" "costs_tanks_trans")
-      (write-matrix (cost-matrix-trans-final problem) stream "TRANS_NODES" "FINAL_NODES" "costs_trans_final"))))
+(defun write-costs (problem stream)
+    (write-matrix (cost-matrix-source-tanks problem) stream "SOURCES" "TANKS" "costs_sources_tanks")
+    (write-matrix (cost-matrix-tanks-trans problem) stream "TANKS" "TRANS_NODES" "costs_tanks_trans")
+    (write-matrix (cost-matrix-trans-final problem) stream "TRANS_NODES" "FINAL_NODES" "costs_trans_final"))
 
 (defun inter-gen-instance (source-number tank-number C1-number C2-number filename)
   (let ((problem (make-instance 'problem
@@ -177,11 +169,11 @@
                  :trans-nodes (aops:generate (lambda () (make-instance 'node)) C1-number)
                  :final-nodes (aops:generate (lambda () (make-instance 'node)) C2-number)
                  :allowed-pipes *allowed-pipes*)))
-    (progn 
-      (write-sets problem filename)
-      (write-pipes problem filename)
-      (write-demands problem filename)
-      (write-costs problem filename))))
+    (with-open-file (stream filename :direction :output :if-does-not-exist :create :if-exists :overwrite)
+      (write-sets problem stream)
+      (write-pipes problem stream)
+      (write-demands problem stream)
+      (write-costs problem stream))))
 
 (defmacro definstance (name source-lower source-higher tank-lower tank-higher c1-lower c1-higher c2-lower c2-higher filename)
   `(defun ,name ()

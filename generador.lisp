@@ -10,6 +10,7 @@
 (defparameter *highest-demand* 100) ; L/min
 
 ; Distribuciones a utilizar, se usa una normal para los costos y una uniforme para la demanda
+(setf *random-state* (make-random-state t))
 (defparameter *cost-distribution* (distributions:r-normal *mu* (* *sigma* *sigma*))) ; mu sigma^2
 (defparameter *demand-distribution* (distributions:r-uniform *lowest-demand* *highest-demand*))
 

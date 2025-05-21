@@ -32,7 +32,8 @@ solve minimize sum(i in SOURCES, j in TANKS, k in PIPE_TYPE)(price_of_pipe[k] * 
              + sum(i in SOURCES, j in TANKS)(costs_sources_tanks[i, j] * quantity_from_source_tank[i, j])                    /* [costo/L] * [L] */
              + sum(i in TANKS, j in TRANS_NODES)(costs_tanks_trans[i, j] * quantity_from_tank_trans[i, j])
              + sum(i in TRANS_NODES, j in FINAL_NODES)(costs_trans_final[i, j] * quantity_from_trans_final[i, j]);
-             
+       
+output ["meta: S = " ++ show(length(SOURCES)) ++ " T = " ++ show(length(TANKS)) ++ " TN = " ++ show(length(TRANS_NODES)) ++ " FN = " ++ show(length(FINAL_NODES)) ++ "\n"];
 output [
   if fix(install_source_tank_type[i, j, k]) = 1 then
     "Se instala cañeria del tipo " ++ show(k) ++ " entre fuente " ++ show(i) ++ " y tanque " ++ show(j) ++

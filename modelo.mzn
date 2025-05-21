@@ -1,6 +1,6 @@
 % Use this editor as a MiniZinc scratch book
 include "ide/vis.mzn";
-include "./ultra.mzn";
+include "./small.mzn";
 
 array[SOURCES, TANKS, PIPE_TYPE] of var bool: install_source_tank_type;
 array[TANKS, TRANS_NODES, PIPE_TYPE] of var bool: install_tank_trans_type;
@@ -32,3 +32,32 @@ solve minimize sum(i in SOURCES, j in TANKS, k in PIPE_TYPE)(price_of_pipe[k] * 
              + sum(i in SOURCES, j in TANKS)(costs_sources_tanks[i, j] * quantity_from_source_tank[i, j])                    /* [costo/L] * [L] */
              + sum(i in TANKS, j in TRANS_NODES)(costs_tanks_trans[i, j] * quantity_from_tank_trans[i, j])
              + sum(i in TRANS_NODES, j in FINAL_NODES)(costs_trans_final[i, j] * quantity_from_trans_final[i, j]);
+             
+output [
+  if fix(install_source_tank_type[i, j, k]) = 1 then
+    "Se instala cañeria del tipo " ++ show(k) ++ " entre fuente " ++ show(i) ++ " y tanque " ++ show(j) ++
+    " con flujo " ++ show(quantity_from_source_tank[i, j]) ++ "\n"
+  else
+    ""
+  endif
+  |
+  i in SOURCES, j in TANKS, k in PIPE_TYPE
+] ++ [
+  if fix(install_tank_trans_type[i, j, k]) = 1 then
+    "Se instala cañeria del tipo " ++ show(k) ++ " entre tanque " ++ show(i) ++ " y nodo transitorio " ++ show(j) ++ 
+    " con flujo " ++ show(quantity_from_tank_trans[i, j]) ++ "\n"
+  else
+    ""
+  endif
+  |
+  i in TANKS, j in TRANS_NODES, k in PIPE_TYPE
+] ++ [
+  if fix(install_trans_final_type[i, j, k]) = 1 then
+    "Se instala cañeria del tipo " ++ show(k) ++ " entre nodo transitorio " ++ show(i) ++ " y nodo final " ++ show(j) ++ 
+    " con flujo " ++ show(quantity_from_trans_final[i, j]) ++ "\n"
+  else
+    ""
+  endif
+  |
+  i in TRANS_NODES, j in FINAL_NODES, k in PIPE_TYPE
+];

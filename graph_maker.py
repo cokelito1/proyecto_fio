@@ -41,9 +41,19 @@ def parse_output(file_path):
 def visualize_graph_stratified(metadata, edges):
     G = nx.DiGraph()
 
+ # Add all nodes from metadata
+    for i in range(1, metadata.get("S", 0) + 1):
+        G.add_node(f"fuente {i}")
+    for i in range(1, metadata.get("T", 0) + 1):
+        G.add_node(f"tanque {i}")
+    for i in range(1, metadata.get("TN", 0) + 1):
+        G.add_node(f"nodo transitorio {i}")
+    for i in range(1, metadata.get("FN", 0) + 1):
+        G.add_node(f"nodo final {i}")
+
     # Add edges with flow labels
     for edge in edges:
-        G.add_edge(edge['from'], edge['to'], label=f"{edge['flow']:.2f}", type=edge['type'])
+        G.add_edge(edge['from'], edge['to'], label=f"{edge['flow']:.2f}, tipo: {edge['type']}", type=edge['type'])
 
     # Prepare node colors for all categories based on metadata
     node_colors = {}
@@ -90,7 +100,7 @@ def visualize_graph_stratified(metadata, edges):
 
     plt.title("Flow Network Stratified by Node Type")
     plt.axis('off')
-    plt.show()
+    plt.savefig("output.png")
 
 if __name__ == "__main__":
     meta, edges = parse_output("output.txt")

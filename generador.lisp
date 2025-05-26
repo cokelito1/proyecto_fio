@@ -9,10 +9,14 @@
 (defparameter *lowest-demand* 40) ; L/min
 (defparameter *highest-demand* 100) ; L/min
 
+(defparameter *lowest-supply* 300) ; L/min
+(defparameter *highest-supply* 1500) ; L/min
+
 ; Distribuciones a utilizar, se usa una normal para los costos y una uniforme para la demanda
 (setf *random-state* (make-random-state t))
 (defparameter *cost-distribution* (distributions:r-normal *mu* (* *sigma* *sigma*))) ; mu sigma^2
 (defparameter *demand-distribution* (distributions:r-uniform *lowest-demand* *highest-demand*))
+(defparameter *supply-distribution* (distributions:r-uniform *lowest-supply* *highest-supply*))
 
 (defun generate-costs (from to)
   (aops:generate (lambda () (distributions:draw *cost-distribution*)) (list from to)))
@@ -40,6 +44,12 @@
     :initform (distributions:draw *demand-distribution*)
     :accessor supply
     :documentation "Supply of the node, by default draw from U(40, 100)")))
+
+(defclass source ()
+  ((max-supply
+    :initarg :max-supply
+    :initform (distributions:draw *supply-distribution*)
+    :accessor max-supply)))
 
 (defclass problem ()
   ((sources
@@ -83,14 +93,15 @@
 (defmethod initialize-instance :after ((obj problem) &rest _)
   (with-slots (sources tanks trans-nodes final-nodes
                cost-matrix-source-tanks cost-matrix-tanks-trans cost-matrix-trans-final) obj
-      (setf cost-matrix-source-tanks (generate-costs sources tanks))
+      (declare (ignore _))
+      (setf cost-matrix-source-tanks (generate-costs (length sources) tanks))
       (setf cost-matrix-tanks-trans (generate-costs tanks (length trans-nodes)))
       (setf cost-matrix-trans-final (generate-costs (length trans-nodes) (length final-nodes)))))
 
 (defmethod print-object ((object problem) stream)
   (print-unreadable-object (object stream :type t)
     (with-slots (sources tanks trans-nodes final-nodes) object
-      (format stream "Sources: ~d~%Tanks: ~d~%Trans nodes: ~d~%Final nodes: ~d~%" sources tanks (length trans-nodes) (length final-nodes)))))
+      (format stream "Sources: ~d~%Tanks: ~d~%Trans nodes: ~d~%Final nodes: ~d~%" (length sources) tanks (length trans-nodes) (length final-nodes)))))
 
 
 (defparameter *available-pipes*
@@ -142,7 +153,7 @@
 
 
 (defun write-sets (problem stream)
-    (format stream "set of int: SOURCES     = 1..~d;~%" (sources problem))
+    (format stream "set of int: SOURCES     = 1..~d;~%" (length (sources problem)))
     (format stream "set of int: TANKS       = 1..~d;~%" (tanks problem))
     (format stream "set of int: TRANS_NODES = 1..~d;~%" (length (trans-nodes problem)))
     (format stream "set of int: FINAL_NODES = 1..~d;~%" (length (final-nodes problem)))
@@ -158,6 +169,9 @@
     (format stream "array[FINAL_NODES] of float: demand_final = [~{~,5f~^, ~}];~%" (coerce (aops:each #'(lambda (node) (supply node)) (final-nodes problem)) 'list))
     (format stream "array[TRANS_NODES] of float: demand_trans = [~{~,5f~^, ~}];~%~%" (coerce (aops:each #'(lambda (node) (supply node)) (trans-nodes problem)) 'list)))
 
+(defun write-supply (problem stream)
+    (format stream "array[SOURCES] of float: supply = [~{~,5f~^, ~}];~%" (coerce (aops:each #'(lambda (node) (max-supply node)) (sources problem)) 'list)))
+
 (defun write-costs (problem stream)
     (write-matrix (cost-matrix-source-tanks problem) stream "SOURCES" "TANKS" "costs_sources_tanks")
     (write-matrix (cost-matrix-tanks-trans problem) stream "TANKS" "TRANS_NODES" "costs_tanks_trans")
@@ -165,7 +179,7 @@
 
 (defun inter-gen-instance (source-number tank-number C1-number C2-number filename)
   (let ((problem (make-instance 'problem
-                 :sources source-number
+                 :sources (aops:generate (lambda () (make-instance 'source)) source-number)
                  :tanks tank-number
                  :trans-nodes (aops:generate (lambda () (make-instance 'node)) C1-number)
                  :final-nodes (aops:generate (lambda () (make-instance 'node)) C2-number)
@@ -173,8 +187,11 @@
     (with-open-file (stream filename :direction :output :if-does-not-exist :create :if-exists :overwrite)
       (write-sets problem stream)
       (write-pipes problem stream)
+      (write-supply problem stream)
       (write-demands problem stream)
       (write-costs problem stream))))
+
+(defun satisfable? (problem))
 
 (defmacro definstance (name source-lower source-higher tank-lower tank-higher c1-lower c1-higher c2-lower c2-higher filename)
   `(defun ,name ()

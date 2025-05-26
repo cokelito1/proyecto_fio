@@ -35,8 +35,11 @@ if [ ! -f "$FILE" ]; then
 fi
 
 # WARNING WARNING WARNING
-# Editamos modelo.mzn para usar la nueva instancia, esto es muy hacky, probablemente hay una mejor forma de hacerlo,
-# minizinc acepta argumentos? probablemente si pero no quiero pensar. Me voy a arrepentir de esto
+# Editamos modelo.mzn para usar la nueva
+# instancia, esto es muy hacky, probablemente
+# hay una mejor forma de hacerlo,
+# minizinc acepta argumentos? probablemente si
+# pero no quiero pensar. Me voy a arrepentir de esto
 
 echo "Changing include in model.mzn"
 sed -i "3s|include \"./.*.mzn\";|include \"./$ARGUMENT.mzn\";|" modelo.mzn

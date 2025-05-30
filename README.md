@@ -4,7 +4,8 @@
 - minizinc con highs
 
 * Ejecucion
+```
 chmod +x generate.sh
 ./generate.sh --<small, medium, big>
-
+```
 Eso ejecutara todos los pasos y entregara el resultado en output.txt y output.png

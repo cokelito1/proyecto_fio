@@ -26,7 +26,7 @@ fi
 echo "Calling generador.lisp with argument '$ARGUMENT'..."
 
 # En caso de error sacar /dev/null, no quiero pensar una mejor forma de hacerlo
-sbcl --load generador.lisp --eval "(gen-instance '$ARGUMENT)" --eval "(quit)" > /dev/null 2>&1
+sbcl --load generador.lisp --eval "(gen-instance '$ARGUMENT)" --eval "(quit)"
 
 # Despues de esto deberia existir el archivo ${ARGUMENT}.mzn, en caso de no existir algo salio mal
 if [ ! -f "$FILE" ]; then
@@ -47,7 +47,7 @@ sed -i "3s|include \"./.*.mzn\";|include \"./$ARGUMENT.mzn\";|" modelo.mzn
 # Llamamos a minizinc para resolver el modelo
 echo -n "Solving model..."
 inicio=$(date +%s.%N)
-minizinc --solver HiGHS modelo.mzn -o output.txt
+minizinc --solver highs modelo.mzn -o output.txt
 fin=$(date +%s.%N)
 runtime=$(echo "$fin - $inicio" | bc)
 echo "FINISHED in $runtime seconds"

@@ -177,6 +177,12 @@
     (write-matrix (cost-matrix-tanks-trans problem) stream "TANKS" "TRANS_NODES" "costs_tanks_trans")
     (write-matrix (cost-matrix-trans-final problem) stream "TRANS_NODES" "FINAL_NODES" "costs_trans_final"))
 
+(defun delta (problem)
+  (let ((total-supply (reduce #'+ (coerce (aops:each #'max-supply (sources problem)) 'list)))
+        (trans-demand (reduce #'+ (coerce (aops:each #'supply (trans-nodes problem)) 'list)))
+        (final-demand (reduce #'+ (coerce (aops:each #'supply (final-nodes problem)) 'list))))
+    (- total-supply (+ trans-demand final-demand))))
+
 (defun inter-gen-instance (source-number tank-number C1-number C2-number filename)
   (let ((problem (make-instance 'problem
                  :sources (aops:generate (lambda () (make-instance 'source)) source-number)
@@ -184,6 +190,26 @@
                  :trans-nodes (aops:generate (lambda () (make-instance 'node)) C1-number)
                  :final-nodes (aops:generate (lambda () (make-instance 'node)) C2-number)
                  :allowed-pipes *allowed-pipes*)))
+    (when (< (delta problem) 0)
+      (setf (sources problem)
+      (concatenate 'vector
+                   (sources problem)
+                   (vector (make-instance 'source :max-supply (+ 1 (- (delta problem)))))))
+      (let ((problem-2 (make-instance 'problem
+                                      :sources (sources problem)
+                                      :tanks tank-number
+                                      :trans-nodes (trans-nodes problem)
+                                      :final-nodes (final-nodes problem)
+                                      :allowed-pipes *allowed-pipes*)))
+    (with-open-file (stream filename :direction :output :if-does-not-exist :create :if-exists :overwrite)
+      (write-sets problem-2 stream)
+      (write-pipes problem-2 stream)
+      (write-supply problem-2 stream)
+      (write-demands problem-2 stream)
+      (write-costs problem-2 stream)))
+      (format t "Se agrego un nodo extra por delta negativo~%")
+      (return-from inter-gen-instance))
+
     (with-open-file (stream filename :direction :output :if-does-not-exist :create :if-exists :overwrite)
       (write-sets problem stream)
       (write-pipes problem stream)
@@ -191,7 +217,6 @@
       (write-demands problem stream)
       (write-costs problem stream))))
 
-(defun satisfable? (problem))
 
 (defmacro definstance (name source-lower source-higher tank-lower tank-higher c1-lower c1-higher c2-lower c2-higher filename)
   `(defun ,name ()

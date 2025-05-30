@@ -1,6 +1,6 @@
 % Use this editor as a MiniZinc scratch book
 include "ide/vis.mzn";
-include "./small.mzn";
+include "./big.mzn";
 
 array[SOURCES, TANKS, PIPE_TYPE] of var bool: install_source_tank_type;
 array[TANKS, TRANS_NODES, PIPE_TYPE] of var bool: install_tank_trans_type;

@@ -1,0 +1,33 @@
+meta: S = 2 T = 9 TN = 9 FN = 16
+Se instala cañeria del tipo 1 entre fuente 1 y tanque 2 con flujo 200.81417
+Se instala cañeria del tipo 1 entre fuente 1 y tanque 4 con flujo 49.68861000000065
+Se instala cañeria del tipo 1 entre fuente 1 y tanque 5 con flujo 440.8591499999999
+Se instala cañeria del tipo 1 entre fuente 1 y tanque 8 con flujo 262.8016499999998
+Se instala cañeria del tipo 1 entre fuente 1 y tanque 9 con flujo 525.7066
+Se instala cañeria del tipo 1 entre fuente 2 y tanque 7 con flujo 320.7272099999992
+Se instala cañeria del tipo 1 entre tanque 2 y nodo transitorio 8 con flujo 200.81417
+Se instala cañeria del tipo 1 entre tanque 4 y nodo transitorio 5 con flujo 49.68861000000065
+Se instala cañeria del tipo 1 entre tanque 5 y nodo transitorio 3 con flujo 308.26495
+Se instala cañeria del tipo 1 entre tanque 5 y nodo transitorio 6 con flujo 132.5941999999999
+Se instala cañeria del tipo 1 entre tanque 7 y nodo transitorio 2 con flujo 89.60952999999995
+Se instala cañeria del tipo 1 entre tanque 7 y nodo transitorio 6 con flujo 28.06163999999987
+Se instala cañeria del tipo 1 entre tanque 7 y nodo transitorio 7 con flujo 203.0560399999993
+Se instala cañeria del tipo 1 entre tanque 8 y nodo transitorio 4 con flujo 262.8016500000003
+Se instala cañeria del tipo 1 entre tanque 9 y nodo transitorio 1 con flujo 99.33401000000001
+Se instala cañeria del tipo 1 entre tanque 9 y nodo transitorio 9 con flujo 426.37259
+Se instala cañeria del tipo 1 entre nodo transitorio 3 y nodo final 2 con flujo 95.77636
+Se instala cañeria del tipo 1 entre nodo transitorio 3 y nodo final 3 con flujo 42.56982
+Se instala cañeria del tipo 1 entre nodo transitorio 3 y nodo final 9 con flujo 51.24503
+Se instala cañeria del tipo 1 entre nodo transitorio 3 y nodo final 14 con flujo 59.63058
+Se instala cañeria del tipo 1 entre nodo transitorio 4 y nodo final 4 con flujo 86.10775
+Se instala cañeria del tipo 1 entre nodo transitorio 4 y nodo final 10 con flujo 76.79712000000001
+Se instala cañeria del tipo 1 entre nodo transitorio 4 y nodo final 13 con flujo 56.57344
+Se instala cañeria del tipo 1 entre nodo transitorio 6 y nodo final 12 con flujo 68.08672999999973
+Se instala cañeria del tipo 1 entre nodo transitorio 7 y nodo final 11 con flujo 66.45771999999999
+Se instala cañeria del tipo 1 entre nodo transitorio 7 y nodo final 15 con flujo 80.31409999999933
+Se instala cañeria del tipo 1 entre nodo transitorio 8 y nodo final 1 con flujo 92.92037999999999
+Se instala cañeria del tipo 1 entre nodo transitorio 8 y nodo final 6 con flujo 43.34021
+Se instala cañeria del tipo 1 entre nodo transitorio 9 y nodo final 5 con flujo 99.19891
+Se instala cañeria del tipo 1 entre nodo transitorio 9 y nodo final 7 con flujo 63.6588
+Se instala cañeria del tipo 1 entre nodo transitorio 9 y nodo final 8 con flujo 84.51839
+Se instala cañeria del tipo 1 entre nodo transitorio 9 y nodo final 16 con flujo 95.27528
